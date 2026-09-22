@@ -59,7 +59,7 @@ import Data.Maybe (Maybe(..))
 import Data.Time as Time
 import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
-import Foreign (F, Foreign, unsafeReadTagged)
+import Foreign (F, Foreign, ForeignError(..), fail, tagOf, unsafeFromForeign)
 
 -- | The type of JavaScript `Date` objects.
 foreign import data JSDate :: Type
@@ -75,7 +75,13 @@ instance showJSDate :: Show JSDate where
 
 -- | Attempts to read a `Foreign` value as a `JSDate`.
 readDate :: Foreign -> F JSDate
-readDate = unsafeReadTagged "Date"
+readDate value
+  | foreignIsDate value = pure (unsafeFromForeign value)
+  | otherwise = fail $ TypeMismatch "Date" (tagOf value)
+
+-- | The native `JSDate` carrier cannot be tagged from `Foreign` (the two
+-- | modules cannot depend on each other), so the check lives here.
+foreign import foreignIsDate :: Foreign -> Boolean
 
 -- | Checks whether a date value is valid. When a date is invalid, the majority
 -- | of the functions return `NaN`, `"Invalid Date"`, or throw an exception.

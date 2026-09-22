@@ -89,6 +89,8 @@ workspace:
       path: "../purust-node-streams"
     now:
       path: "../purust-now"
+    numbers:
+      path: "../purust-numbers"
     nullable:
       path: "../purust-nullable"
     partial:

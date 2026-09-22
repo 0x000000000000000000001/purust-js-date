@@ -65,13 +65,13 @@ pub fn Data_JSDate_now() -> crate::UnknownType {
             .duration_since(UNIX_EPOCH)
             .map(|elapsed| elapsed.as_millis() as f64)
             .unwrap_or(0.0);
-        crate::Value::Class(Data_JSDate_fromTime(milliseconds))
+        crate::Value::Class(Rc::new(Data_JSDate_fromTime(milliseconds)))
     }))
 }
 
 pub fn Data_JSDate_parse(source: String) -> crate::UnknownType {
     crate::Value::Func1(purust_core::Func1::Shared(Rc::new(move |_| {
-        crate::Value::Class(parse_date(&source))
+        crate::Value::Class(Rc::new(parse_date(&source)))
     })))
 }
 

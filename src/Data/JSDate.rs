@@ -401,8 +401,13 @@ fn parse_iso(text: &str) -> Option<([f64; 7], Option<i64>)> {
             index += 3;
         }
     }
-    if index < bytes.len() && (bytes[index] == b'T' || bytes[index] == b' ') {
+    // V8 also accepts the time separated by `:` (e.g. `2022-01-01:13:45Z`).
+    let colon_separator = bytes.get(index) == Some(&b':');
+    if index < bytes.len() && (bytes[index] == b'T' || bytes[index] == b' ' || colon_separator) {
         fields[3] = digits(index + 1, 2)? as f64;
+        if colon_separator && bytes.get(index + 3) != Some(&b':') {
+            return None;
+        }
         if index + 3 <= bytes.len() && bytes.get(index + 3) == Some(&b':') {
             fields[4] = digits(index + 4, 2)? as f64;
             index += 6;
@@ -419,7 +424,10 @@ fn parse_iso(text: &str) -> Option<([f64; 7], Option<i64>)> {
             index += 3;
         }
         match bytes.get(index) {
-            Some(b'Z') => offset = Some(0),
+            Some(b'Z') | Some(b'z') => {
+                offset = Some(0);
+                index += 1;
+            }
             Some(b'+') | Some(b'-') => {
                 let sign = if bytes[index] == b'+' { 1 } else { -1 };
                 let hours = digits(index + 1, 2)?;

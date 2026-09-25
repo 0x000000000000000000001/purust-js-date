@@ -23,6 +23,11 @@ export function isValid(date) {
   return !isNaN(date.getTime());
 }
 
+// The native carrier is a JavaScript Date, so the tag check is realm-local.
+export function foreignIsDate(value) {
+  return value instanceof Date;
+}
+
 export function toInstantImpl(just) {
   return function(nothing) {
     return function(date) {

@@ -161,7 +161,7 @@ struct CTm {
     tm_yday: i32,
     tm_isdst: i32,
     tm_gmtoff: i64,
-    tm_zone: *const i8,
+    tm_zone: *const std::os::raw::c_char,
 }
 
 extern "C" {
